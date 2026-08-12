@@ -193,8 +193,8 @@ textarea{min-height:120px}
     </div>
 
     <div class="champ">
-      <label for="titre">Qu'est-ce que je décide ?</label>
-      <input type="text" id="titre" placeholder="Par exemple : l'opération de l'épaule">
+      <label for="titre">Qu'est-ce que je décide ?</label>
+      <input type="text" id="titre" placeholder="Par exemple : l'opération de l'épaule">
     </div>
 
     <div id="questions"></div>
@@ -232,15 +232,20 @@ textarea{min-height:120px}
 const CLE = 'surpapier_pages';
 
 const QUESTIONS = [
-  { id:'apport',      texte:"Qu'est-ce que ça pourrait m'apporter ?",
+  { id:'apport',      etiquette:"Ce que je pourrais gagner",
+    texte:"Qu'est-ce que ça pourrait m'apporter ?",
     aide:"Ce que j'espère y gagner, même si ce n'est pas certain." },
-  { id:'frein',       texte:"Qu'est-ce qui me retient ?",
+  { id:'frein',       etiquette:"Ce qui me retient",
+    texte:"Qu'est-ce qui me retient ?",
     aide:"Le plus précisément possible." },
-  { id:'cout',        texte:"Qu'est-ce que ça me coûterait, et pendant combien de temps ?",
+  { id:'cout',        etiquette:"Le coût, et la durée",
+    texte:"Qu'est-ce que ça me coûterait, et pendant combien de temps ?",
     aide:"Douleur, temps, argent, arrêt d'activité, aide à demander." },
-  { id:'inaction',    texte:"Où j'en serai dans deux ans si je ne fais rien ?",
+  { id:'inaction',    etiquette:"Si je ne fais rien",
+    texte:"Où j'en serai dans deux ans si je ne fais rien ?",
     aide:"Ne rien faire est un choix aussi. Il a ses suites." },
-  { id:'incertitude', texte:"Qu'est-ce qui reste incertain pour moi ?",
+  { id:'incertitude', etiquette:"Ce qui reste incertain",
+    texte:"Qu'est-ce qui reste incertain pour moi ?",
     aide:"Ce que je ne sais pas encore, ou que personne ne peut me garantir." }
 ];
 
@@ -383,7 +388,7 @@ function rendrePage(){
     bloc.className = 'bloc';
     const question = document.createElement('div');
     question.className = 'question';
-    question.textContent = q.texte;
+    question.textContent = q.etiquette;
     const reponse = document.createElement('div');
     const valeur = (p.reponses[q.id] || '').trim();
     if(valeur){
@@ -464,7 +469,7 @@ document.getElementById('btn-supprimer').addEventListener('click', ()=>{
   const p = pageCourante();
   if(!p) return;
   const nom = p.titre.trim() || 'cette page';
-  if(confirm('Supprimer ' + nom + ' ? Ce qui est écrit sera perdu.')){
+  if(confirm('Supprimer ' + nom + ' ? Ce qui est écrit sera perdu.')){
     pages = pages.filter(x=>x.id !== p.id);
     idCourant = null;
     enregistrer();

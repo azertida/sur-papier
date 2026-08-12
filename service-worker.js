@@ -1,6 +1,6 @@
 // Sur papier — service worker
 // À INCRÉMENTER À CHAQUE MISE À JOUR DE L'APPLICATION
-const VERSION = 'surpapier-v3';
+const VERSION = 'surpapier-v4';
 
 const FICHIERS = [
   './',

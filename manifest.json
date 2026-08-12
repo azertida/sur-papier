@@ -1,0 +1,26 @@
+{
+  "name": "Sur papier",
+  "short_name": "Sur papier",
+  "description": "Mettre une décision par écrit, pour la voir en entier.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F1E7",
+  "theme_color": "#F6F1E7",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

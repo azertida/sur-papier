@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sur papier</title>
+<meta name="description" content="Mettre une décision par écrit, pour la voir en entier.">
+<meta name="theme-color" content="#F6F1E7">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sur papier">
+<style>
+:root{
+  --papier:#F6F1E7;
+  --papier-creux:#EFE8DA;
+  --encre:#2C2A26;
+  --encre-pale:#6E685D;
+  --trait:#D8CFBC;
+  --marque:#7A6A52;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--papier);
+  color:var(--encre);
+  font-family:'Atkinson Hyperlegible','Atkinson Hyperlegible Next',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  font-size:19px;
+  line-height:1.6;
+  padding:24px 20px 64px;
+  -webkit-font-smoothing:antialiased;
+}
+.feuille{max-width:640px;margin:0 auto}
+
+h1{
+  font-family:Fraunces,'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+  font-size:2.1rem;
+  font-weight:600;
+  letter-spacing:-0.01em;
+  line-height:1.15;
+}
+h2{
+  font-family:Fraunces,'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+  font-size:1.35rem;
+  font-weight:600;
+  line-height:1.3;
+}
+.sous-titre{color:var(--encre-pale);margin-top:8px;font-size:1rem}
+.entete{padding-bottom:20px;border-bottom:1px solid var(--trait);margin-bottom:28px}
+
+/* --- boutons --- */
+button{
+  font-family:inherit;
+  font-size:1rem;
+  cursor:pointer;
+  border-radius:10px;
+  min-height:52px;
+  padding:14px 20px;
+  transition:background .15s ease,border-color .15s ease;
+}
+.bouton{
+  background:var(--encre);
+  color:var(--papier);
+  border:2px solid var(--encre);
+  width:100%;
+  font-weight:700;
+}
+.bouton:hover{background:#413D36}
+.bouton-doux{
+  background:transparent;
+  color:var(--encre);
+  border:2px solid var(--trait);
+  width:100%;
+}
+.bouton-doux:hover{border-color:var(--marque)}
+.bouton-texte{
+  background:none;border:none;color:var(--encre-pale);
+  text-decoration:underline;padding:12px 4px;min-height:48px;font-size:.95rem;
+}
+.bouton-texte:hover{color:var(--encre)}
+.pile{display:flex;flex-direction:column;gap:12px;margin-top:28px}
+:focus-visible{outline:3px solid var(--marque);outline-offset:3px}
+
+/* --- liste des pages --- */
+.liste{list-style:none;margin-top:28px}
+.liste li{border-top:1px solid var(--trait)}
+.liste li:last-child{border-bottom:1px solid var(--trait)}
+.item{
+  width:100%;background:none;border:none;text-align:left;
+  padding:18px 4px;border-radius:0;
+}
+.item:hover{background:var(--papier-creux)}
+.item .titre{font-size:1.1rem;font-weight:700;display:block}
+.item .date{color:var(--encre-pale);font-size:.9rem;display:block;margin-top:2px}
+.vide{
+  color:var(--encre-pale);
+  border:1px dashed var(--trait);
+  border-radius:12px;
+  padding:24px;
+  margin-top:28px;
+  text-align:center;
+}
+
+/* --- formulaire --- */
+label{display:block;font-weight:700;margin-bottom:10px;font-size:1.05rem}
+input[type=text],textarea{
+  width:100%;
+  font-family:inherit;
+  font-size:1.05rem;
+  line-height:1.55;
+  color:var(--encre);
+  background:#FDFAF4;
+  border:1px solid var(--trait);
+  border-radius:10px;
+  padding:14px;
+  resize:vertical;
+}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--marque);box-shadow:0 0 0 3px rgba(122,106,82,.15)}
+textarea{min-height:120px}
+.champ{margin-bottom:32px}
+.aide{color:var(--encre-pale);font-size:.92rem;margin:-4px 0 10px}
+
+/* --- la page récapitulative --- */
+.bloc{padding:22px 0;border-top:1px solid var(--trait)}
+.bloc:last-of-type{border-bottom:1px solid var(--trait)}
+.bloc .question{
+  font-size:.82rem;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--marque);
+  font-weight:700;
+  margin-bottom:10px;
+}
+.bloc .reponse{
+  font-family:Fraunces,'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+  font-size:1.2rem;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+.bloc .rien{font-family:inherit;font-size:1rem;color:var(--encre-pale);font-style:italic}
+.date-page{color:var(--encre-pale);font-size:.95rem;margin-top:6px}
+
+.sauvegarde{
+  position:fixed;left:0;right:0;bottom:0;
+  text-align:center;padding:10px;
+  background:var(--papier-creux);color:var(--encre-pale);font-size:.9rem;
+  opacity:0;transition:opacity .3s ease;pointer-events:none;
+}
+.sauvegarde.visible{opacity:1}
+
+.pied{margin-top:44px;padding-top:20px;border-top:1px solid var(--trait);display:flex;gap:20px;flex-wrap:wrap}
+.masque{display:none}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+@media print{
+  body{background:#fff;padding:0;font-size:12pt}
+  .bouton,.bouton-doux,.bouton-texte,.pied,.sauvegarde{display:none!important}
+  .bloc{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="feuille">
+
+  <!-- ACCUEIL -->
+  <section id="ecran-accueil">
+    <div class="entete">
+      <h1>Sur papier</h1>
+      <p class="sous-titre">Une décision à prendre. Cinq questions. Une page pour tout voir en même temps.</p>
+    </div>
+
+    <div id="liste-pages"></div>
+
+    <div class="pile">
+      <button class="bouton" id="btn-nouvelle">Écrire une nouvelle page</button>
+    </div>
+
+    <div class="pied">
+      <button class="bouton-texte" id="btn-export">Enregistrer une copie</button>
+      <button class="bouton-texte" id="btn-import">Récupérer une copie</button>
+      <input type="file" id="fichier-import" accept="application/json,.json" class="masque">
+    </div>
+  </section>
+
+  <!-- ÉCRITURE -->
+  <section id="ecran-ecriture" class="masque">
+    <div class="entete">
+      <h2>Ma page</h2>
+      <p class="sous-titre">Ce que j'écris s'enregistre tout seul. Je peux laisser des questions de côté et y revenir.</p>
+    </div>
+
+    <div class="champ">
+      <label for="titre">Qu'est-ce que je décide ?</label>
+      <input type="text" id="titre" placeholder="Par exemple : l'opération de l'épaule">
+    </div>
+
+    <div id="questions"></div>
+
+    <div class="pile">
+      <button class="bouton" id="btn-voir">Voir ma page</button>
+      <button class="bouton-doux" id="btn-retour-ecriture">Revenir à la liste</button>
+      <button class="bouton-texte" id="btn-supprimer">Supprimer cette page</button>
+    </div>
+  </section>
+
+  <!-- PAGE RÉCAPITULATIVE -->
+  <section id="ecran-page" class="masque">
+    <div class="entete">
+      <h1 id="page-titre"></h1>
+      <p class="date-page" id="page-date"></p>
+    </div>
+
+    <div id="page-blocs"></div>
+
+    <div class="pile">
+      <button class="bouton-doux" id="btn-modifier">Modifier mes réponses</button>
+      <button class="bouton-doux" id="btn-imprimer">Imprimer cette page</button>
+      <button class="bouton-doux" id="btn-retour-page">Revenir à la liste</button>
+    </div>
+  </section>
+
+</div>
+
+<div class="sauvegarde" id="sauvegarde" role="status">Enregistré</div>
+
+<script>
+'use strict';
+
+const CLE = 'surpapier_pages';
+
+const QUESTIONS = [
+  { id:'apport',      texte:"Qu'est-ce que ça pourrait m'apporter ?",
+    aide:"Ce que j'espère y gagner, même si ce n'est pas certain." },
+  { id:'frein',       texte:"Qu'est-ce qui me retient ?",
+    aide:"Le plus précisément possible." },
+  { id:'cout',        texte:"Qu'est-ce que ça me coûterait, et pendant combien de temps ?",
+    aide:"Douleur, temps, argent, arrêt d'activité, aide à demander." },
+  { id:'inaction',    texte:"Où j'en serai dans deux ans si je ne fais rien ?",
+    aide:"Ne rien faire est un choix aussi. Il a ses suites." },
+  { id:'incertitude', texte:"Qu'est-ce qui reste incertain pour moi ?",
+    aide:"Ce que je ne sais pas encore, ou que personne ne peut me garantir." }
+];
+
+let pages = [];
+let idCourant = null;
+let minuteurSauvegarde = null;
+
+/* ---------- stockage ---------- */
+function charger(){
+  try{
+    const brut = localStorage.getItem(CLE);
+    pages = brut ? JSON.parse(brut) : [];
+    if(!Array.isArray(pages)) pages = [];
+  }catch(e){ pages = []; }
+}
+
+function enregistrer(){
+  try{
+    localStorage.setItem(CLE, JSON.stringify(pages));
+    signalerSauvegarde();
+  }catch(e){
+    alert("L'enregistrement n'a pas fonctionné. La mémoire de l'appareil est peut-être pleine.");
+  }
+}
+
+function signalerSauvegarde(){
+  const zone = document.getElementById('sauvegarde');
+  zone.classList.add('visible');
+  clearTimeout(minuteurSauvegarde);
+  minuteurSauvegarde = setTimeout(()=>zone.classList.remove('visible'), 1400);
+}
+
+function pageCourante(){ return pages.find(p => p.id === idCourant) || null; }
+
+function formaterDate(iso){
+  const d = new Date(iso);
+  if(isNaN(d)) return '';
+  return d.toLocaleDateString('fr-BE',{day:'numeric',month:'long',year:'numeric'});
+}
+
+/* ---------- navigation ---------- */
+function afficher(ecran){
+  ['accueil','ecriture','page'].forEach(nom=>{
+    document.getElementById('ecran-'+nom).classList.toggle('masque', nom !== ecran);
+  });
+  window.scrollTo(0,0);
+}
+
+/* ---------- accueil ---------- */
+function rendreAccueil(){
+  const zone = document.getElementById('liste-pages');
+  if(pages.length === 0){
+    zone.innerHTML = '<p class="vide">Aucune page pour l\'instant. La première décision à mettre par écrit est peut-être celle qui tourne en boucle.</p>';
+    afficher('accueil');
+    return;
+  }
+  const ul = document.createElement('ul');
+  ul.className = 'liste';
+  pages.slice().sort((a,b)=> b.creee.localeCompare(a.creee)).forEach(p=>{
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.className = 'item';
+    const t = document.createElement('span');
+    t.className = 'titre';
+    t.textContent = p.titre.trim() || 'Page sans titre';
+    const d = document.createElement('span');
+    d.className = 'date';
+    d.textContent = 'Commencée le ' + formaterDate(p.creee);
+    b.appendChild(t); b.appendChild(d);
+    b.addEventListener('click', ()=>{ idCourant = p.id; rendrePage(); });
+    li.appendChild(b);
+    ul.appendChild(li);
+  });
+  zone.innerHTML = '';
+  zone.appendChild(ul);
+  afficher('accueil');
+}
+
+/* ---------- écriture ---------- */
+function construireQuestions(){
+  const zone = document.getElementById('questions');
+  zone.innerHTML = '';
+  QUESTIONS.forEach(q=>{
+    const div = document.createElement('div');
+    div.className = 'champ';
+    const lab = document.createElement('label');
+    lab.setAttribute('for','q-'+q.id);
+    lab.textContent = q.texte;
+    const aide = document.createElement('p');
+    aide.className = 'aide';
+    aide.textContent = q.aide;
+    const ta = document.createElement('textarea');
+    ta.id = 'q-'+q.id;
+    ta.addEventListener('input', ()=>{
+      const p = pageCourante();
+      if(!p) return;
+      p.reponses[q.id] = ta.value;
+      enregistrer();
+    });
+    div.appendChild(lab); div.appendChild(aide); div.appendChild(ta);
+    zone.appendChild(div);
+  });
+}
+
+function rendreEcriture(){
+  const p = pageCourante();
+  if(!p) return rendreAccueil();
+  document.getElementById('titre').value = p.titre;
+  QUESTIONS.forEach(q=>{
+    document.getElementById('q-'+q.id).value = p.reponses[q.id] || '';
+  });
+  afficher('ecriture');
+}
+
+function nouvellePage(){
+  const p = {
+    id: 'p' + Date.now() + Math.random().toString(36).slice(2,7),
+    titre: '',
+    creee: new Date().toISOString(),
+    reponses: {}
+  };
+  pages.push(p);
+  idCourant = p.id;
+  enregistrer();
+  rendreEcriture();
+  document.getElementById('titre').focus();
+}
+
+/* ---------- page récapitulative ---------- */
+function rendrePage(){
+  const p = pageCourante();
+  if(!p) return rendreAccueil();
+  document.getElementById('page-titre').textContent = p.titre.trim() || 'Page sans titre';
+  document.getElementById('page-date').textContent = 'Écrite le ' + formaterDate(p.creee);
+
+  const zone = document.getElementById('page-blocs');
+  zone.innerHTML = '';
+  QUESTIONS.forEach(q=>{
+    const bloc = document.createElement('div');
+    bloc.className = 'bloc';
+    const question = document.createElement('div');
+    question.className = 'question';
+    question.textContent = q.texte;
+    const reponse = document.createElement('div');
+    const valeur = (p.reponses[q.id] || '').trim();
+    if(valeur){
+      reponse.className = 'reponse';
+      reponse.textContent = valeur;
+    }else{
+      reponse.className = 'reponse rien';
+      reponse.textContent = "Je n'ai pas encore répondu à celle-ci.";
+    }
+    bloc.appendChild(question); bloc.appendChild(reponse);
+    zone.appendChild(bloc);
+  });
+  afficher('page');
+}
+
+/* ---------- copies ---------- */
+function exporter(){
+  if(pages.length === 0){
+    alert("Il n'y a encore rien à enregistrer.");
+    return;
+  }
+  const contenu = JSON.stringify({ application:'sur-papier', version:1, pages:pages }, null, 2);
+  const lien = document.createElement('a');
+  const url = URL.createObjectURL(new Blob([contenu],{type:'application/json'}));
+  lien.href = url;
+  lien.download = 'sur-papier-' + new Date().toISOString().slice(0,10) + '.json';
+  lien.click();
+  URL.revokeObjectURL(url);
+}
+
+function importer(fichier){
+  const lecteur = new FileReader();
+  lecteur.onload = e=>{
+    try{
+      const donnees = JSON.parse(e.target.result);
+      const arrivantes = Array.isArray(donnees) ? donnees : donnees.pages;
+      if(!Array.isArray(arrivantes)) throw new Error('format');
+      let ajoutees = 0;
+      arrivantes.forEach(p=>{
+        if(!p || !p.id) return;
+        if(pages.some(x=>x.id === p.id)) return;
+        pages.push({
+          id:p.id,
+          titre: typeof p.titre === 'string' ? p.titre : '',
+          creee: p.creee || new Date().toISOString(),
+          reponses: (p.reponses && typeof p.reponses === 'object') ? p.reponses : {}
+        });
+        ajoutees++;
+      });
+      enregistrer();
+      rendreAccueil();
+      alert(ajoutees === 0
+        ? "Ces pages étaient déjà là. Rien n'a été ajouté."
+        : ajoutees + (ajoutees > 1 ? ' pages ajoutées.' : ' page ajoutée.'));
+    }catch(err){
+      alert("Ce fichier n'a pas pu être lu. Il faut choisir un fichier enregistré depuis Sur papier.");
+    }
+  };
+  lecteur.readAsText(fichier);
+}
+
+/* ---------- branchements ---------- */
+document.getElementById('btn-nouvelle').addEventListener('click', nouvellePage);
+document.getElementById('btn-voir').addEventListener('click', rendrePage);
+document.getElementById('btn-retour-ecriture').addEventListener('click', ()=>{ idCourant = null; rendreAccueil(); });
+document.getElementById('btn-retour-page').addEventListener('click', ()=>{ idCourant = null; rendreAccueil(); });
+document.getElementById('btn-modifier').addEventListener('click', rendreEcriture);
+document.getElementById('btn-imprimer').addEventListener('click', ()=>window.print());
+
+document.getElementById('titre').addEventListener('input', function(){
+  const p = pageCourante();
+  if(!p) return;
+  p.titre = this.value;
+  enregistrer();
+});
+
+document.getElementById('btn-supprimer').addEventListener('click', ()=>{
+  const p = pageCourante();
+  if(!p) return;
+  const nom = p.titre.trim() || 'cette page';
+  if(confirm('Supprimer ' + nom + ' ? Ce qui est écrit sera perdu.')){
+    pages = pages.filter(x=>x.id !== p.id);
+    idCourant = null;
+    enregistrer();
+    rendreAccueil();
+  }
+});
+
+document.getElementById('btn-export').addEventListener('click', exporter);
+document.getElementById('btn-import').addEventListener('click', ()=>document.getElementById('fichier-import').click());
+document.getElementById('fichier-import').addEventListener('change', function(){
+  if(this.files && this.files[0]) importer(this.files[0]);
+  this.value = '';
+});
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./service-worker.js', {scope:'./'})
+      .catch(()=>{ /* hors ligne indisponible, l'application fonctionne quand même */ });
+  });
+}
+
+charger();
+construireQuestions();
+rendreAccueil();
+</script>
+</body>
+</html>
